@@ -66,6 +66,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 // create a blog
+
 router.post("/createblog", upload.single("file"), async (req, res) => {
   const { title, description } = req.body;
 
@@ -73,7 +74,7 @@ router.post("/createblog", upload.single("file"), async (req, res) => {
   const newBlog = new Blogs({
     title,
     description,
-    file: filepath,
+    file: filepath ? `upload/${path.basename(filepath)}` : null,
   });
   try {
     const savedblog = await newBlog.save();
@@ -84,16 +85,30 @@ router.post("/createblog", upload.single("file"), async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
 // update a blog by id
 router.put("/updateblog/:id", upload.single("file"), async (req, res) => {
+  const { title, description } = req.body;
   try {
-    const updatedblog = await Blogs.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    if (!updatedblog) {
+    if (!objectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    const blogToUpdate = await Blogs.findById(req.params.id);
+    if (!blogToUpdate ) {
       res.status(404).json({ message: "Error updating blog" });
     }
-    res.json({ message: "Blog updated successfully", updatedblog });
+    blogToUpdate.title = title;
+    blogToUpdate.description = description;
+
+    if (req.file) {
+      // If a new file is uploaded, update the file path
+      blogToUpdate.file = `upload/${path.basename(req.file.path)}`;
+    }
+    const updatedBlog = await blogToUpdate.save();
+
+    res.json({ message: "Blog updated successfully", updatedBlog });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

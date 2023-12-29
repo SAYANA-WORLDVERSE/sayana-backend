@@ -37,8 +37,15 @@ const storage = multer.diskStorage({
     );
   },
 });
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only images and PDFs are allowed.'), false);
+  }
+};
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage,fileFilter: fileFilter });
 
 // get All candidate
 router.get("/allcandidates", async (req, res) => {
@@ -75,7 +82,7 @@ router.post("/applycandidates", upload.single("file"), async (req, res) => {
     email: email,
     position: position,
     message: message,
-    file: filepath,
+    file: filepath ? `upload/${path.basename(filepath)}` : null,
   });
   try {
     const savedCandidates = await newCandidate.save();
