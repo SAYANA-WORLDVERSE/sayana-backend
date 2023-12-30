@@ -17,27 +17,25 @@ router.get("/allcategory", async (req, res) => {
 });
 
 router.post("/createcategory", async (req, res) => {
-  const { name } = req.body;
+  const { project_name } = req.body;
   try {
-    const existingCategory = await Category.findOne({ name });
+    const existingCategory = await Category.findOne({ project_name });
     if (existingCategory) {
       res.status(200).json({ message: "Category already exists" });
     }
     const newcategory = new Category({
-      name
+      project_name,
     });
 
     await newcategory.save();
 
-    res.status(201).json({ message: "Category created sucessfully " });
+    res
+      .status(201)
+      .json({ message: "Category created sucessfully ", newcategory });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-
-
-
-
 
 router.delete("/:id", async (req, res) => {
   try {

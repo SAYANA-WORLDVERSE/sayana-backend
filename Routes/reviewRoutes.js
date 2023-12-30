@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 
 const objectId = mongoose.Types.ObjectId;
 
-
 router.get("/Allreviews", async (req, res) => {
   try {
     const allReviews = await Review.find();
@@ -32,17 +31,14 @@ router.get("/:id", async (req, res) => {
 });
 router.post("/createReview", async (req, res) => {
   try {
-    const { name,  rating, title, description } = req.body;
-    const review = await Review({ name,  rating, title, description });
+    const { name, rating, title, description } = req.body;
+    const review = await Review({ name, rating, title, description });
     review.save();
     res.status(201).json({ message: "review saved successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
-  } 
+  }
 });
-
-
-
 
 router.put("/editReview/:id", async (req, res) => {
   try {
@@ -69,12 +65,10 @@ router.delete("/deletereview/:id", async (req, res) => {
     if (!deletedreview) {
       res.status(404).json({ message: "review not found" });
     }
-    res
-      .status(200)
-      .json({
-        message: "review deleted successfully",
-        deletedreview: deletedreview,
-      });
+    res.status(200).json({
+      message: "review deleted successfully",
+      deletedreview: deletedreview,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -2,10 +2,10 @@ import express from "express";
 import Blogs from "../Models/blog.js";
 import mongoose from "mongoose";
 import multer from "multer";
-import path from "path"
+import path from "path";
 import fs from "fs/promises";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 const router = express.Router();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -86,7 +86,6 @@ router.post("/createblog", upload.single("file"), async (req, res) => {
   }
 });
 
-
 // update a blog by id
 router.put("/updateblog/:id", upload.single("file"), async (req, res) => {
   const { title, description } = req.body;
@@ -96,7 +95,7 @@ router.put("/updateblog/:id", upload.single("file"), async (req, res) => {
     }
 
     const blogToUpdate = await Blogs.findById(req.params.id);
-    if (!blogToUpdate ) {
+    if (!blogToUpdate) {
       res.status(404).json({ message: "Error updating blog" });
     }
     blogToUpdate.title = title;
