@@ -1,10 +1,11 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import path from "path"
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
+import path from "path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import helmet from "helmet";
+import morgan from "morgan";
 import connectDB from "./Database/db.js";
 import blogRoutes from "./Routes/blogRoutes.js";
 import userRoutes from "./Routes/userRoutes.js";
@@ -20,14 +21,25 @@ const __dirname = dirname(__filename);
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 4000;
+// connect to the mongoose server
 connectDB();
+
+// all middlewares
 app.use(cors());
-app.use(bodyParser.json());
-app.use('/upload', express.static(path.join(__dirname, '../upload')));
-app.get('/upload/:filename', (req, res) => {
-  const filename = req.params.filename;
-  res.sendFile(path.join(__dirname, 'upload', filename));
+app.use(helmet());
+app.use(morgan("combined"));
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
 });
+app.use(bodyParser.json());
+app.use("/upload", express.static(path.join(__dirname, "../upload")));
+app.get("/upload/:filename", (req, res) => {
+  const filename = req.params.filename;
+  res.sendFile(path.join(__dirname, "upload", filename));
+});
+
+// all routes
 app.use("/blog", blogRoutes);
 app.use("/", userRoutes);
 app.use("/review", reviewRoutes);

@@ -50,15 +50,15 @@ router.get("/getalldetails", async (req, res) => {
 
 // create a blog
 router.post("/createdetails", upload.single("file"), async (req, res) => {
-  const { location, number, email, social_link } = req.body;
+  const { location, number, email, social_links } = req.body;
 
   const filepath = req.file ? req.file.path : null;
   const newContact = new Contact({
     location,
     number,
     email,
-    social_link,
-    file: filepath,
+    social_links,
+    file: filepath ? `upload/${path.basename(filepath)}` : null,
   });
   try {
     const contactDetails = await newContact.save();
@@ -69,9 +69,9 @@ router.post("/createdetails", upload.single("file"), async (req, res) => {
   }
 });
 // update a blog by id
-router.put("/updateblog/:id", upload.single("file"), async (req, res) => {
+router.put("/updatedetails/", upload.single("file"), async (req, res) => {
   try {
-    const updatedblog = await Blogs.findByIdAndUpdate(req.params.id, req.body, {
+    const updatedblog = await Contact.findByIdAndUpdate( req.body, {
       new: true,
     });
     if (!updatedblog) {
@@ -83,9 +83,9 @@ router.put("/updateblog/:id", upload.single("file"), async (req, res) => {
   }
 });
 // delete a blog by id
-router.delete("/:id", async (req, res) => {
+router.delete("/deletedetails", async (req, res) => {
   try {
-    const deletedblog = await Blogs.findByIdAndDelete(req.params.id);
+    const deletedblog = await Contact.findByIdAndDelete(req.body.id);
     if (!deletedblog) {
       res.status(404).json({ message: "Blog not found" });
     }
